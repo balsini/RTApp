@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">RTApp</string>
+    <string name="decrease_threads">Dec. Threads</string>
+    <string name="increase_threads">Inc. Threads</string>
+</resources>
