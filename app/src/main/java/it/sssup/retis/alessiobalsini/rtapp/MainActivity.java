@@ -33,13 +33,12 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = (TextView) findViewById(R.id.dbg_txt);
         tv.append("Calibrating load...");
 
-        Calibration c = new Calibration(100000000);
+        Calibration c = new Calibration(10, 100000000);
         c.start();
 
         try {
             c.join();
-            tv.append("DONE: " + c.result());
-
+            tv.append("DONE\nInstructions/ns: " + c.instructions_over_ns() + "\n");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

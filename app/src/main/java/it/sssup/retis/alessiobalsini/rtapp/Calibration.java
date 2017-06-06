@@ -9,36 +9,48 @@ import android.util.Log;
 public class Calibration extends Thread {
 
     private String TAG = "Calibration";
-    private long counter;
-    private long max;
-    private long time;
 
-    public Calibration(long max) {
+    private int measures;
+    private long max;
+    private long time[];
+
+    public Calibration(int measures, long max) {
+        this.measures = measures;
+        time = new long[this.measures];
         this.max = max;
     }
 
     @Override
     public void run() {
-        counter = 0;
         long start_time;
         long end_time;
 
         //android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
-        start_time = System.currentTimeMillis();
+        for (int i = 0; i < measures; i++) {
+            long counter = 0;
 
-        while (counter < max) {
-            counter++;
+            start_time = System.nanoTime();
+
+            while (counter < max) {
+                counter++;
+            }
+
+            end_time = System.nanoTime();
+
+            time[i] = end_time - start_time;
+
+            Log.d(TAG, "time: " + time[i]);
         }
-
-        end_time = System.currentTimeMillis();
-
-        time = end_time - start_time;
-
-        Log.d(TAG, "time: " + time);
     }
 
-    public double result() {
-        return (double) counter / (double)time;
+    public double instructions_over_ns() {
+        double sum = 0;
+
+        for (int i = 0; i < measures; i++) {
+            sum = sum + time[i];
+        }
+
+        return (double) max / (double) sum * (double) measures;
     }
 }
