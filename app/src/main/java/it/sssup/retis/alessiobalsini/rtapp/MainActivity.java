@@ -27,10 +27,17 @@ public class MainActivity extends AppCompatActivity {
         showThreadsNumber();
     }
 
+    public void calibrate(View view) {
+        TextView tv = (TextView) findViewById(R.id.dbg_txt);
+        tv.append("Calibrating load...");
+
+
+    }
+
     private synchronized void showThreadsNumber() {
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.dbg_txt);
-        tv.setText(stringFromJNI() + "\n" + my_threads.size() + "/" + Runtime.getRuntime().availableProcessors());
+        tv.append(stringFromJNI() + ": " + my_threads.size() + "/" + Runtime.getRuntime().availableProcessors() + "\n");
     }
 
     public synchronized void increase_threads(View view) {
