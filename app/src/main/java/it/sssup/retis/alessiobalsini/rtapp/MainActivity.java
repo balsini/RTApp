@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         first_activation_ms = System.currentTimeMillis() + phase;
         first_activation = new Date(first_activation_ms);
-        task = new BusyWait("Task_" + timers.size(),
+        task = new BusyWait("Task_" + (timers.size() - 1),
                 first_activation_ms,
                 period,
                 deadline,

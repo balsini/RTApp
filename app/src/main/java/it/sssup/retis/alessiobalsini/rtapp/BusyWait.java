@@ -10,24 +10,17 @@ import java.util.TimerTask;
  */
 
 public class BusyWait extends TimerTask {
-
+    private String TAG;
     private long T; // Period (ms)
     private long D; // Deadline (ms)
     private long C; // Computation time (ms)
     private long first_activation; // Computation time (ms)
     private long job_id;
 
-    private String TAG;
-
     private void javaBusyWait(long s, long ms) {
-        long now;
-        long wakeup = SystemClock.currentThreadTimeMillis();
+        long wakeup = SystemClock.currentThreadTimeMillis() + (s * 1000) + ms;
 
-        wakeup += (s * 1000) + ms;
-
-        do {
-            now = SystemClock.currentThreadTimeMillis();
-        } while (now < wakeup);
+        while (SystemClock.currentThreadTimeMillis() < wakeup) ;
     }
 
     public BusyWait(String name, long first_activation, long period_ms, long deadline_ms, long computation_ms) {
@@ -42,23 +35,29 @@ public class BusyWait extends TimerTask {
 
     @Override
     public void run() {
-        long activation = first_activation + (T * job_id);
-        long starting = 0;
-        long finishing = 0;
+        long s_i = System.currentTimeMillis();
+        long f_i;
+        long a_i = first_activation + (T * job_id);
+        long d = a_i + D;
 
-        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        //android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
-        starting = System.currentTimeMillis();
         javaBusyWait(0, C);
-        finishing = System.currentTimeMillis();
-
-        Log.d(TAG, "run: job " + job_id
-                + " a_i: " + activation
-                + " jitter: " + (starting - activation)
-                + " C: " + (finishing - starting));
-
         job_id++;
-    }
 
-    public native void waitAbsolute(long absTime_ms);
+        f_i = System.currentTimeMillis();
+
+        if (f_i > d) {
+            Log.d(TAG, "!!! DEADLINE MISS !!!");
+            while (first_activation + (T * (job_id + 1)) < System.currentTimeMillis()) {
+                Log.d(TAG, "Skipping job " + job_id);
+                job_id++;
+            }
+        } else {
+            Log.d(TAG, "job: " + job_id
+                    + "\ta_i: " + a_i
+                    + "\tjitter: " + (s_i - a_i)
+                    + "\tC: " + (f_i - s_i));
+        }
+    }
 }
