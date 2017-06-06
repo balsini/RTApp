@@ -15,7 +15,7 @@ public class BusyWait extends Thread {
 
     private String TAG = "BusyWait";
 
-    private void busyWait(long s, long ms) {
+    private void javaBusyWait(long s, long ms) {
         long now;
         long wakeup = SystemClock.currentThreadTimeMillis();
 
@@ -50,7 +50,7 @@ public class BusyWait extends Thread {
             while (!isInterrupted()) {
 
                 starting = System.currentTimeMillis();
-                busyWait(0, C);
+                javaBusyWait(0, C);
                 finishing = System.currentTimeMillis();
 
                 Log.d(TAG, "run: job " + i + " busyWaiting (ms): jitter: " + (starting - activation) + " C: " + (finishing - starting));

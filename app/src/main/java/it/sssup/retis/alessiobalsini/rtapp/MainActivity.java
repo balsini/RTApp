@@ -9,6 +9,8 @@ import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
 
+
+
     private LinkedList<Thread> my_threads;
 
     // Used to load the 'native-lib' library on application startup.
@@ -31,7 +33,16 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = (TextView) findViewById(R.id.dbg_txt);
         tv.append("Calibrating load...");
 
+        Calibration c = new Calibration(100000000);
+        c.start();
 
+        try {
+            c.join();
+            tv.append("DONE: " + c.result());
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private synchronized void showThreadsNumber() {
