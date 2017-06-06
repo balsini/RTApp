@@ -10,9 +10,8 @@ import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
     private LinkedList<Thread> my_threads;
+    double instructions_per_ns;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -23,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        instructions_per_ns = 0;
 
         my_threads = new LinkedList<Thread>();
         my_threads.clear();
@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void calibrate(View view) {
         Calibration c = new Calibration(20, 100000000);
+        instructions_per_ns = 0;
 
         appendDbgText("Calibrating...\n");
 
@@ -51,11 +52,15 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 c.join();
-                appendDbgText("- Instructions/ns: " + c.instructions_over_ns() + "\n");
+                appendDbgText("- Instr./ns: " + c.instructions_over_ns() + "\n");
+                if (instructions_per_ns < c.instructions_over_ns()) {
+                    instructions_per_ns = c.instructions_over_ns();
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        appendDbgText("-- Chosen : " + instructions_per_ns + "\n");
         appendDbgText("DONE\n");
     }
 
