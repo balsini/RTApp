@@ -3,6 +3,7 @@ package it.sssup.retis.alessiobalsini.rtapp;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.LinkedList;
@@ -29,25 +30,37 @@ public class MainActivity extends AppCompatActivity {
         showThreadsNumber();
     }
 
-    public void calibrate(View view) {
+    private void appendDbgText(String txt) {
         TextView tv = (TextView) findViewById(R.id.dbg_txt);
-        tv.append("Calibrating load...");
+        tv.append(txt);
 
-        Calibration c = new Calibration(10, 100000000);
-        c.start();
+        ((ScrollView) findViewById(R.id.dbg_scroll)).post(new Runnable() {
+            public void run() {
+                ((ScrollView) findViewById(R.id.dbg_scroll)).fullScroll(View.FOCUS_DOWN);
+            }
+        });
+    }
 
-        try {
-            c.join();
-            tv.append("DONE\nInstructions/ns: " + c.instructions_over_ns() + "\n");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public void calibrate(View view) {
+        Calibration c = new Calibration(20, 100000000);
+
+        appendDbgText("Calibrating...\n");
+
+        for (int i=0; i<5; i++) {
+            c.start();
+
+            try {
+                c.join();
+                appendDbgText("- Instructions/ns: " + c.instructions_over_ns() + "\n");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+        appendDbgText("DONE\n");
     }
 
     private synchronized void showThreadsNumber() {
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.dbg_txt);
-        tv.append(stringFromJNI() + ": " + my_threads.size() + "/" + Runtime.getRuntime().availableProcessors() + "\n");
+        appendDbgText(stringFromJNI() + ": " + my_threads.size() + "/" + Runtime.getRuntime().availableProcessors() + "\n");
     }
 
     public synchronized void increase_threads(View view) {

@@ -1,7 +1,5 @@
 package it.sssup.retis.alessiobalsini.rtapp;
 
-import android.util.Log;
-
 /**
  * Created by alessio on 06/06/17.
  */
@@ -40,7 +38,7 @@ public class Calibration extends Thread {
 
             time[i] = end_time - start_time;
 
-            Log.d(TAG, "time: " + time[i]);
+            //Log.d(TAG, "time: " + time[i]);
         }
     }
 
