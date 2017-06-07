@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         Timer timer;
         long period = 100;
         long deadline = 100;
-        long computation = 80;
+        long computation = 10;
         long phase = 2000;
         long first_activation_ms;
 
