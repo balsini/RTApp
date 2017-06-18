@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
         long phase = 2000;
         long first_activation_ms;
 
+        appendDbgText(getSchedulingInfo() + "\n");
+
         timer = new Timer();
         timers.add(timer);
 
@@ -114,4 +116,5 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+    private native String getSchedulingInfo();
 }

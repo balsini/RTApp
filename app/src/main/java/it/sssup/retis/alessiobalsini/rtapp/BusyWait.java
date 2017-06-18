@@ -94,5 +94,9 @@ public class BusyWait extends TimerTask {
                     + "\tjitter: " + delay
                     + "\tC: " + (f_i - s_i));
         }
+
+        Log.d(TAG, getSchedulingInfo());
     }
+
+    private native String getSchedulingInfo();
 }
