@@ -5,8 +5,9 @@
 #include <sched.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include <sys/syscall.h>
 #include <sys/resource.h>
+#include <unistd.h>
+#include <sys/syscall.h>
 
 extern "C"
 JNIEXPORT jstring JNICALL
@@ -37,7 +38,7 @@ Java_it_sssup_retis_alessiobalsini_rtapp_BusyWait_getSchedulingInfo(JNIEnv *env,
     ss << "Scheduling info: "
        << "process (" << tid << ") "
        << "scheduler (" << sn << ") "
-       << "priority (" << sp.__sched_priority << ") "
+       << "priority (" << sp.sched_priority << ") "
        << "niceness (" << snice << ") "
        << "affinity (";
 
@@ -71,7 +72,7 @@ Java_it_sssup_retis_alessiobalsini_rtapp_MainActivity_getSchedulingInfo(JNIEnv *
     ss << "Scheduling info: "
        << "process (" << tid << ") "
        << "scheduler (" << sn << ") "
-       << "priority (" << sp.__sched_priority << ") "
+       << "priority (" << sp.sched_priority << ") "
        << "niceness (" << snice << ") "
        << "affinity (";
 
