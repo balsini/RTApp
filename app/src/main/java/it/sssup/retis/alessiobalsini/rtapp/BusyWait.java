@@ -1,8 +1,10 @@
 package it.sssup.retis.alessiobalsini.rtapp;
 
+import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
 
+import java.lang.reflect.Method;
 import java.util.TimerTask;
 
 /**
@@ -65,6 +67,27 @@ public class BusyWait extends TimerTask {
         Log.d(TAG, v);
     }
 
+    private String threadGroupIdToString(int id) {
+        switch (id) {
+            case -1:
+                return "THREAD_GROUP_DEFAULT";
+            case 0:
+                return "THREAD_GROUP_BG_NONINTERACTIVE";
+            case 1:
+                return "THREAD_GROUP_FOREGROUND";
+            case 2:
+                return "THREAD_GROUP_SYSTEM";
+            case 3:
+                return "THREAD_GROUP_AUDIO_APP";
+            case 4:
+                return "THREAD_GROUP_AUDIO_SYS";
+            case 5:
+                return "THREAD_GROUP_TOP_APP";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
     @Override
     public void run() {
         long s_i = System.currentTimeMillis();
@@ -75,7 +98,7 @@ public class BusyWait extends TimerTask {
         long f_i;
         long lateness;
 
-        //android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
 
         job_id++;
         busyWait();
@@ -95,7 +118,17 @@ public class BusyWait extends TimerTask {
                     + "\tC: " + (f_i - s_i));
         }
 
-        Log.d(TAG, getSchedulingInfo());
+        Class c;
+        try {
+            c = Class.forName("android.os.Process");
+            Method m = c.getMethod("getProcessGroup", new Class[]{int.class});
+            Object o = m.invoke(null, 0);
+
+            Log.d(TAG, getSchedulingInfo() + " group (" + threadGroupIdToString((int) o) + " (" + o.toString() + "))");
+        } catch (Exception e) {
+            Log.d(TAG, "---- EXCEPTION ----" + e.getStackTrace());
+        }
+
     }
 
     private native String getSchedulingInfo();

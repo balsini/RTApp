@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.Timer;
 
 import static java.lang.Math.ceil;
+import static java.lang.System.getProperty;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         timers.clear();
 
         showThreadsNumber();
+
+        appendDbgText("Property debug.sys.noschedgroups: " + getProperty("debug.sys.noschedgroups") + "\n");
     }
 
     private void appendDbgText(String txt) {
