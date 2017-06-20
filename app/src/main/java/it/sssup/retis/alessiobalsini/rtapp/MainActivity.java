@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public synchronized void increase_threads(View view) {
-        BusyWait task;
+        TimerTaskWorker task;
         Date first_activation;
         Timer timer;
         long period = 100;
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         first_activation_ms = System.currentTimeMillis() + phase;
         first_activation = new Date(first_activation_ms);
-        task = new BusyWait("Task_" + (timers.size() - 1),
+        task = new TimerTaskWorker("Task_" + (timers.size() - 1),
                 first_activation_ms,
                 period,
                 deadline,

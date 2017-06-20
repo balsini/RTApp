@@ -11,7 +11,7 @@ import java.util.TimerTask;
  * Created by alessio on 05/06/17.
  */
 
-public class BusyWait extends TimerTask {
+public class TimerTaskWorker extends TimerTask {
     private String TAG;
 
     private long T; // Period (ms)
@@ -27,7 +27,7 @@ public class BusyWait extends TimerTask {
         while (SystemClock.currentThreadTimeMillis() - wakeup < 0) ;
     }
 
-    public BusyWait(String name, long first_activation, long period_ms, long deadline_ms, long computation_ms) {
+    public TimerTaskWorker(String name, long first_activation, long period_ms, long deadline_ms, long computation_ms) {
         TAG = name;
         T = period_ms;
         d = deadline_ms;

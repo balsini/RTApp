@@ -20,7 +20,7 @@ Java_it_sssup_retis_alessiobalsini_rtapp_MainActivity_stringFromJNI(JNIEnv *env,
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_it_sssup_retis_alessiobalsini_rtapp_BusyWait_getSchedulingInfo(JNIEnv *env, jobject)
+Java_it_sssup_retis_alessiobalsini_rtapp_TimerTaskWorker_getSchedulingInfo(JNIEnv *env, jobject)
 {
     sched_param sp;
     int tid;
@@ -89,7 +89,7 @@ Java_it_sssup_retis_alessiobalsini_rtapp_MainActivity_getSchedulingInfo(JNIEnv *
 #if 0
 extern "C"
 JNIEXPORT jstring JNICALL
-void Java_it_sssup_retis_alessiobalsini_rtapp_BusyWait_waitAbsolute(long long absTime_ms)
+void Java_it_sssup_retis_alessiobalsini_rtapp_TimerTaskWorker_waitAbsolute(long long absTime_ms)
 {
     /*
     timespec now, wakeup;
