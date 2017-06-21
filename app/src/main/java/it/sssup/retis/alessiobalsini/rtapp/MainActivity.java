@@ -2,8 +2,12 @@ package it.sssup.retis.alessiobalsini.rtapp;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.Date;
@@ -39,6 +43,48 @@ public class MainActivity extends AppCompatActivity {
         showThreadsNumber();
 
         appendDbgText("Property debug.sys.noschedgroups: " + getProperty("debug.sys.noschedgroups") + "\n");
+
+        ((EditText) findViewById(R.id.utilizationValue)).addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                if (s.length() != 0) {
+                    ((SeekBar) findViewById(R.id.utilizationSeekBar)).setProgress((int) (Double.parseDouble(s.toString()) * 100.0));
+                }
+            }
+        });
+
+        ((SeekBar) findViewById(R.id.utilizationSeekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar s) {}
+
+            @Override
+            public void onStartTrackingTouch(SeekBar s) {}
+
+            @Override
+            public void onProgressChanged(SeekBar s, int v, boolean b) {
+
+                EditText textField = ((EditText) findViewById(R.id.utilizationValue));
+                double valueInField = Double.parseDouble(textField.getText().toString());
+
+                if ((int)(valueInField * 100.0) != v) {
+
+                    String newTextValue = Double.toString((double)(v) / 100.0);
+
+                    textField.setText(newTextValue);
+                }
+
+            }
+        });
     }
 
     private void appendDbgText(String txt) {
@@ -83,11 +129,11 @@ public class MainActivity extends AppCompatActivity {
         TimerTaskWorker task;
         Date first_activation;
         Timer timer;
-        long period = 100;
-        long deadline = 100;
-        long computation = 10;
-        long phase = 2000;
-        long first_activation_ms;
+        double period = Double.parseDouble(((EditText) findViewById(R.id.periodValue)).getText().toString());
+        double computation = Double.parseDouble(((EditText) findViewById(R.id.utilizationValue)).getText().toString()) * period;
+        double deadline = period;
+        double phase = 2000;
+        double first_activation_ms;
 
         appendDbgText(getSchedulingInfo() + "\n");
 
@@ -95,13 +141,13 @@ public class MainActivity extends AppCompatActivity {
         timers.add(timer);
 
         first_activation_ms = System.currentTimeMillis() + phase;
-        first_activation = new Date(first_activation_ms);
+        first_activation = new Date((long)first_activation_ms);
         task = new TimerTaskWorker("Task_" + (timers.size() - 1),
                 first_activation_ms,
                 period,
                 deadline,
                 computation);
-        timer.scheduleAtFixedRate(task, first_activation, period);
+        timer.scheduleAtFixedRate(task, first_activation, (long)period);
 
         showThreadsNumber();
     }
