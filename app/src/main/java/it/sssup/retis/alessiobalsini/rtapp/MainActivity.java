@@ -14,21 +14,14 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Timer;
 
-import static java.lang.Math.ceil;
 import static java.lang.System.getProperty;
 
 public class MainActivity extends AppCompatActivity {
     private LinkedList<Timer> timers;
-    double instructions_per_ns;
 
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
-    }
-
-    private long instructions_to_wait_ns(double time_ns)
-    {
-        return (long) ceil(instructions_per_ns * time_ns);
     }
 
     @Override
@@ -36,14 +29,6 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        instructions_per_ns = 0;
-
-        timers = new LinkedList<Timer>();
-        timers.clear();
-
-        showThreadsNumber();
-
-        appendDbgText("Property debug.sys.noschedgroups: " + getProperty("debug.sys.noschedgroups") + "\n");
 
         ((EditText) findViewById(R.id.utilizationValue)).addTextChangedListener(new TextWatcher()
         {
@@ -63,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
                                       int before, int count)
             {
                 if (s.length() != 0) {
-                    ((SeekBar) findViewById(R.id.utilizationSeekBar)).setProgress((int) (Double.parseDouble(s.toString()) * 100.0));
+                    double value = Double.parseDouble(s.toString());
+
+                    ((SeekBar) findViewById(R.id.utilizationSeekBar)).setProgress((int) (value * 100.0));
                 }
             }
         });
@@ -88,14 +75,32 @@ public class MainActivity extends AppCompatActivity {
                 if ((int)(valueInField * 100.0) != v) {
                     String newTextValue = Double.toString((double)(v) / 100.0);
 
+                    GlobalTaskParameters.C = GlobalTaskParameters.T * v / 100.0;
+
                     textField.setText(newTextValue);
                 }
             }
         });
 
-        for (int i=0; i<8; i++) {
-            increase_threads();
-        }
+        String period = getIntent().getStringExtra("period");
+        if (period == null)
+            period = "200";
+
+        String utilization = getIntent().getStringExtra("utilization");
+        if (utilization == null)
+            utilization = "0.3";
+
+        ((EditText) findViewById(R.id.utilizationValue)).setText(utilization);
+        ((EditText) findViewById(R.id.periodValue)).setText(period);
+
+        timers = new LinkedList<Timer>();
+        timers.clear();
+
+        showThreadsNumber();
+
+        appendDbgText("Desired Utilization: " + utilization + " Desired Period: " + period + "\n");
+
+        appendDbgText("Property debug.sys.noschedgroups: " + getProperty("debug.sys.noschedgroups") + "\n");
     }
 
     private void appendDbgText(String txt)
@@ -127,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         double deadline = period;
         double phase = 2000;
         double first_activation_ms;
+        boolean global = true;
 
         appendDbgText(getSchedulingInfo() + "\n");
 
@@ -135,11 +141,21 @@ public class MainActivity extends AppCompatActivity {
 
         first_activation_ms = System.currentTimeMillis() + phase;
         first_activation = new Date((long)first_activation_ms);
-        task = new TimerTaskWorker("Task_" + (timers.size() - 1),
-                first_activation_ms,
-                period,
-                deadline,
-                computation);
+
+        if (global) {
+            GlobalTaskParameters.T = period;
+            GlobalTaskParameters.d = deadline;
+            GlobalTaskParameters.C = computation;
+
+            task = new TimerTaskWorker("Task_" + (timers.size() - 1),
+                    first_activation_ms);
+        } else {
+            task = new TimerTaskWorker("Task_" + (timers.size() - 1),
+                    first_activation_ms,
+                    period,
+                    deadline,
+                    computation);
+        }
         timer.scheduleAtFixedRate(task, first_activation, (long)period);
 
         showThreadsNumber();

@@ -19,12 +19,13 @@ public class TimerTaskWorker extends TimerTask {
     private double C; // Computation time (ms)
     private double a_0; // Computation time (ms)
     private long job_id;
+    private boolean global_parameters;
 
-    private void busyWait()
+    private void busyWait(long time_ms)
     {
         long wakeup;
 
-        wakeup = SystemClock.currentThreadTimeMillis() + (long)C;
+        wakeup = SystemClock.currentThreadTimeMillis() + time_ms;
         while (SystemClock.currentThreadTimeMillis() - wakeup < 0) ;
     }
 
@@ -35,11 +36,20 @@ public class TimerTaskWorker extends TimerTask {
                            double computation_ms)
     {
         TAG = name;
+        global_parameters = false;
         T = period_ms;
         d = deadline_ms;
         C = computation_ms;
         a_0 = first_activation;
+        job_id = 0;
+    }
 
+    public TimerTaskWorker(String name,
+                           double first_activation)
+    {
+        TAG = name;
+        global_parameters = true;
+        a_0 = first_activation;
         job_id = 0;
     }
 
@@ -47,25 +57,34 @@ public class TimerTaskWorker extends TimerTask {
     {
         String v;
         double x_max = 60.0;
-        double scale = T / x_max;
+        double period = global_parameters ? GlobalTaskParameters.T : T;
+        double scale = period / x_max;
 
         v = "[";
 
-        for (int i=0; i < (s_i - a_i) / scale; i++) {
+        double scaled_jitter = (s_i - a_i) / scale;
+
+        for (int i=0; i < scaled_jitter; i++) {
             v = v + "_";
         }
 
-        for (int i=0; i < (f_i - s_i) / scale; i++) {
+        double scaled_computation = (f_i - s_i) / scale;
+
+        for (int i=0; i < scaled_computation; i++) {
             v = v + "#";
         }
 
-        for (int i=0; i < (D_i - f_i) / scale; i++) {
+        double scaled_time_until_dl = (D_i - f_i) / scale;
+
+        for (int i=0; i < scaled_time_until_dl; i++) {
             v = v + "_";
         }
 
         v = v + "|";
 
-        for (int i=0; i < (D_i - f_i  - T) / scale; i++) {
+        double scaled_time_until_next_activation = (D_i - f_i - period) / scale;
+
+        for (int i=0; i < scaled_time_until_next_activation; i++) {
             v = v + "_";
         }
 
@@ -100,17 +119,34 @@ public class TimerTaskWorker extends TimerTask {
     public void run()
     {
         double s_i = System.currentTimeMillis();
-        double a_i =  a_0 + (T * job_id);
-        double D_i = a_i + d;
-        double delay = s_i - a_i;
-        double next_activation = a_0 + (T * (job_id + 1));
+        double a_i;
+        double D_i;
+        double next_activation;
         double f_i;
         double lateness;
+        double delay;
+
+        if (global_parameters) {
+            a_i =  a_0 + (GlobalTaskParameters.T * job_id);
+            D_i = a_i + GlobalTaskParameters.d;
+            next_activation = a_0 + (GlobalTaskParameters.T * (job_id + 1));
+        } else {
+            a_i =  a_0 + (T * job_id);
+            D_i = a_i + d;
+            next_activation = a_0 + (T * (job_id + 1));
+        }
+
+        delay = s_i - a_i;
 
         android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
 
         job_id++;
-        busyWait();
+
+        if (global_parameters) {
+            busyWait((long)GlobalTaskParameters.C);
+        } else {
+            busyWait((long)C);
+        }
 
         f_i = System.currentTimeMillis();
 
