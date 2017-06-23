@@ -18,7 +18,6 @@ import static java.lang.Math.ceil;
 import static java.lang.System.getProperty;
 
 public class MainActivity extends AppCompatActivity {
-
     private LinkedList<Timer> timers;
     double instructions_per_ns;
 
@@ -27,12 +26,14 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
-    private long instructions_to_wait_ns(double time_ns) {
+    private long instructions_to_wait_ns(double time_ns)
+    {
         return (long) ceil(instructions_per_ns * time_ns);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         instructions_per_ns = 0;
@@ -44,18 +45,23 @@ public class MainActivity extends AppCompatActivity {
 
         appendDbgText("Property debug.sys.noschedgroups: " + getProperty("debug.sys.noschedgroups") + "\n");
 
-        ((EditText) findViewById(R.id.utilizationValue)).addTextChangedListener(new TextWatcher() {
-
+        ((EditText) findViewById(R.id.utilizationValue)).addTextChangedListener(new TextWatcher()
+        {
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s)
+            {
+            }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) {}
+                                          int count, int after)
+            {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start,
-                                      int before, int count) {
+                                      int before, int count)
+            {
                 if (s.length() != 0) {
                     ((SeekBar) findViewById(R.id.utilizationSeekBar)).setProgress((int) (Double.parseDouble(s.toString()) * 100.0));
                 }
@@ -63,69 +69,56 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ((SeekBar) findViewById(R.id.utilizationSeekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar s)
+            {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar s) {}
+            public void onStartTrackingTouch(SeekBar s)
+            {
+            }
 
             @Override
-            public void onStartTrackingTouch(SeekBar s) {}
-
-            @Override
-            public void onProgressChanged(SeekBar s, int v, boolean b) {
-
+            public void onProgressChanged(SeekBar s, int v, boolean b)
+            {
                 EditText textField = ((EditText) findViewById(R.id.utilizationValue));
                 double valueInField = Double.parseDouble(textField.getText().toString());
 
                 if ((int)(valueInField * 100.0) != v) {
-
                     String newTextValue = Double.toString((double)(v) / 100.0);
 
                     textField.setText(newTextValue);
                 }
-
             }
         });
+
+        for (int i=0; i<8; i++) {
+            increase_threads();
+        }
     }
 
-    private void appendDbgText(String txt) {
+    private void appendDbgText(String txt)
+    {
         TextView tv = (TextView) findViewById(R.id.dbg_txt);
         tv.append(txt);
 
         ((ScrollView) findViewById(R.id.dbg_scroll)).post(new Runnable() {
-            public void run() {
+            public void run()
+            {
                 ((ScrollView) findViewById(R.id.dbg_scroll)).fullScroll(View.FOCUS_DOWN);
             }
         });
     }
 
-    public void calibrate(View view) {
-        Calibration c = new Calibration(20, 100000);
-        instructions_per_ns = 0;
-
-        appendDbgText("Calibrating...\n");
-
-        for (int i=0; i<5; i++) {
-            c.start();
-
-            try {
-                c.join();
-                appendDbgText("- Instr./ns: " + c.instructions_over_ns() + "\n");
-                if (instructions_per_ns < c.instructions_over_ns()) {
-                    instructions_per_ns = c.instructions_over_ns();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        appendDbgText("-- Chosen : " + instructions_per_ns + "\n");
-        appendDbgText("DONE\n");
+    private synchronized void showThreadsNumber()
+    {
+        ((TextView) findViewById(R.id.threads_over_cores)).setText("Threads: " + timers.size()
+                + " Cores: " + Runtime.getRuntime().availableProcessors());
     }
 
-    private synchronized void showThreadsNumber() {
-        appendDbgText(stringFromJNI() + ": " + timers.size() + "/" + Runtime.getRuntime().availableProcessors() + "\n");
-    }
-
-    public synchronized void increase_threads(View view) {
+    private synchronized void increase_threads()
+    {
         TimerTaskWorker task;
         Date first_activation;
         Timer timer;
@@ -152,12 +145,23 @@ public class MainActivity extends AppCompatActivity {
         showThreadsNumber();
     }
 
-    public synchronized void decrease_threads(View view) {
+    private synchronized void decrease_threads()
+    {
         if (timers.size() > 0) {
             timers.get(timers.size() - 1).cancel();
             timers.remove(timers.size() - 1);
         }
         showThreadsNumber();
+    }
+
+    public void increase_threads_callback(View v)
+    {
+        increase_threads();
+    }
+
+    public synchronized void decrease_threads_callback(View v)
+    {
+        decrease_threads();
     }
 
     /**

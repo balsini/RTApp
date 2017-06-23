@@ -27,43 +27,6 @@
             app:layout_constraintRight_toRightOf="@+id/textView"
             app:layout_constraintTop_toBottomOf="@+id/periodValue" />
 
-        <Button
-            android:id="@+id/button_inc_threads"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:onClick="increase_threads"
-            android:text="@string/increase_threads"
-            android:textSize="8sp"
-            app:layout_constraintRight_toLeftOf="@+id/button_dec_threads"
-            app:layout_constraintTop_toTopOf="@+id/button_calibrate" />
-
-        <Button
-            android:id="@+id/button_calibrate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:onClick="calibrate"
-            android:text="@string/calibrate"
-            android:textSize="8sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/button_dec_threads"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
-            android:layout_marginRight="15dp"
-            android:onClick="decrease_threads"
-            android:text="@string/decrease_threads"
-            android:textSize="8sp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/button_inc_threads" />
-
         <EditText
             android:id="@+id/periodValue"
             android:layout_width="0dp"
@@ -83,12 +46,12 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="7dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="Period/Deadline (ms)"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_calibrate" />
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
         <EditText
             android:id="@+id/utilizationValue"
@@ -96,7 +59,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
-            android:text="0.2"
+            android:text="0.3"
             app:layout_constraintLeft_toLeftOf="@+id/periodValue"
             app:layout_constraintRight_toRightOf="@+id/periodValue"
             app:layout_constraintTop_toTopOf="@+id/textView2" />
@@ -109,6 +72,45 @@
             android:progress="20"
             app:layout_constraintTop_toBottomOf="@+id/utilizationValue"
             tools:layout_editor_absoluteX="8dp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="352dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="8dp">
+
+            <Button
+                android:id="@+id/button_inc_threads"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="increase_threads_callback"
+                android:text="@string/increase_threads"
+                android:textSize="8sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/button_dec_threads"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="decrease_threads_callback"
+                android:text="@string/decrease_threads"
+                android:textSize="8sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/button_inc_threads" />
+
+            <TextView
+                android:id="@+id/threads_over_cores"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="TextView"
+                android:textAlignment="center" />
+
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 

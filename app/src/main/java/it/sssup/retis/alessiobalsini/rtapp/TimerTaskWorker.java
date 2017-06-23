@@ -20,7 +20,8 @@ public class TimerTaskWorker extends TimerTask {
     private double a_0; // Computation time (ms)
     private long job_id;
 
-    private void busyWait() {
+    private void busyWait()
+    {
         long wakeup;
 
         wakeup = SystemClock.currentThreadTimeMillis() + (long)C;
@@ -31,7 +32,8 @@ public class TimerTaskWorker extends TimerTask {
                            double first_activation,
                            double period_ms,
                            double deadline_ms,
-                           double computation_ms) {
+                           double computation_ms)
+    {
         TAG = name;
         T = period_ms;
         d = deadline_ms;
@@ -41,7 +43,8 @@ public class TimerTaskWorker extends TimerTask {
         job_id = 0;
     }
 
-    private void prettyStats(double a_i, double s_i, double f_i, double D_i) {
+    private void prettyStats(double a_i, double s_i, double f_i, double D_i)
+    {
         String v;
         double x_max = 60.0;
         double scale = T / x_max;
@@ -71,7 +74,8 @@ public class TimerTaskWorker extends TimerTask {
         Log.d(TAG, v);
     }
 
-    private String threadGroupIdToString(int id) {
+    private String threadGroupIdToString(int id)
+    {
         switch (id) {
             case -1:
                 return "THREAD_GROUP_DEFAULT";
@@ -93,7 +97,8 @@ public class TimerTaskWorker extends TimerTask {
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
         double s_i = System.currentTimeMillis();
         double a_i =  a_0 + (T * job_id);
         double D_i = a_i + d;
