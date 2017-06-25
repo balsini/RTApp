@@ -82,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        String tasks = getIntent().getStringExtra("tasks");
+        if (tasks == null)
+            tasks = "8";
+
         String period = getIntent().getStringExtra("period");
         if (period == null)
             period = "200";
@@ -95,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
         timers = new LinkedList<Timer>();
         timers.clear();
+
+        for (int i=0; i<Integer.parseInt(tasks); i++) {
+            increase_threads();
+        }
 
         showThreadsNumber();
 

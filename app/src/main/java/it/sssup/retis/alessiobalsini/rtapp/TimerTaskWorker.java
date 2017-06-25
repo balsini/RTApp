@@ -4,7 +4,6 @@ import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
 
-import java.lang.reflect.Method;
 import java.util.TimerTask;
 
 /**
@@ -148,6 +147,7 @@ public class TimerTaskWorker extends TimerTask {
             busyWait((long)C);
         }
 
+        /*
         f_i = System.currentTimeMillis();
 
         lateness = f_i - D_i;
@@ -173,7 +173,7 @@ public class TimerTaskWorker extends TimerTask {
         } catch (Exception e) {
             Log.d(TAG, "---- EXCEPTION ----" + e.getStackTrace());
         }
-
+        */
     }
 
     private native String getSchedulingInfo();

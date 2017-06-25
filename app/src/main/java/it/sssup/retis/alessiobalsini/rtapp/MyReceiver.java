@@ -3,7 +3,6 @@ package it.sssup.retis.alessiobalsini.rtapp;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
 /*
  * Use with
@@ -15,12 +14,14 @@ public class MyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        String outputText;
         String period = intent.getStringExtra("period");
         String utilization = intent.getStringExtra("utilization");
 
-        outputText = "RTApp intent detected. Period: " + period + " Utilization: " + utilization;
+        //String outputText = "RTApp intent detected. Period: " + period + " Utilization: " + utilization;
+        //Toast.makeText(context, outputText, Toast.LENGTH_LONG).show();
 
-        Toast.makeText(context, outputText, Toast.LENGTH_LONG).show();
+        GlobalTaskParameters.T = Double.parseDouble(period);
+        GlobalTaskParameters.d = GlobalTaskParameters.T;
+        GlobalTaskParameters.C = Double.parseDouble(utilization) * GlobalTaskParameters.T;
     }
 }
