@@ -101,7 +101,7 @@ def parse_message(msg) :
     print(data)
     plot_data(task_id = task, task_data = data)
   except struct.error:
-    print("struct.error, going on..." * 10000)
+    print("ERROR: struct.error, skipping message")
     pass
   
 #------------------------------------------
@@ -115,7 +115,7 @@ sock.bind((UDP_IP, UDP_PORT))
 print("DONE")
 
 while True:
-    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+    data, addr = sock.recvfrom(4096)
     print("Message received, size: " + str(len(data)))
     #print("---")
     #print(data)

@@ -44,7 +44,7 @@ public class TimerTaskWorker extends TimerTask {
         TAG = "Task_" + String.valueOf(id);
         job_id = 0;
         RT_c = 0;
-        RT_max = 125;
+        RT_max = 254;
         RT = new double[RT_max];
     }
 
