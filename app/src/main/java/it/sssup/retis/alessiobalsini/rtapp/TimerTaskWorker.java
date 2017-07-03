@@ -175,7 +175,6 @@ public class TimerTaskWorker extends TimerTask {
 
             for (int i = 0; i < RT_max; i++) {
                 dos.writeDouble(RT[i]);
-                Log.d(TAG, "Sending: " + RT[i]);
             }
 
             dos.close();
@@ -186,7 +185,6 @@ public class TimerTaskWorker extends TimerTask {
             s.send(p);
 
             Log.d(TAG, "UDP: message sent");
-
         } catch (Exception e) {
             Log.d(TAG, "UDP: Exception in sending: " + e.toString());
         }
@@ -236,9 +234,9 @@ public class TimerTaskWorker extends TimerTask {
             send_stats();
             RT_c = 0;
         }
-
-        prettyStats(a_i, s_i, f_i, D_i);
 /*
+        prettyStats(a_i, s_i, f_i, D_i);
+
         if (lateness > 0) {
             Log.d(TAG, "!!! DEADLINE MISS !!!");
         } else {
