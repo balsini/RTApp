@@ -21,9 +21,11 @@ print("RTAppPC v" + VERSION)
 
 columns = 4
 rows = 2
+max_x = 0
 
 f, axes = plt.subplots(rows, columns, sharey=True)
 
+plt.title("Cumulative distribution")
 plt.axis([0,1,0,1])
 plt.ion()
 plt.show()
@@ -56,15 +58,16 @@ def plot_data(task_id, task_data) :
   
   x, y = generate_axes(task_data)
   
-  #print("x:", x)
-  #print("y:", y)
+  global max_x
+  if max_x < len(x) :
+    max_x = len(x)
   
-  #axes[task_id].axis([0,40,0,40])
-  
-  plt.axis([0,len(x),0,1])
+  plt.axis([0,max_x,0,1])
   #ax.clear()
   ax.plot(x, y)
   ax.set_title("Task_" + str(task_id))
+  ax.set_xlabel("Response Time (ms)")
+  ax.set_ylabel("Samples distribution")
   plt.draw()
   plt.pause(0.001)
   
@@ -89,10 +92,9 @@ def parse_message(msg) :
   print("Data Size:", dataSize)
   print("Length:", length)
   print("Data:", length / dataSize)
-  
-  data = []
-  
+    
   try:
+    data = []
     for i in xrange(length) :
       value = struct.unpack(">d", msg[offset:(offset + dataSize)])[0]
       data.append(value)
