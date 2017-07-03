@@ -14,6 +14,12 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp">
 
+        <LinearLayout
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:layout_width="0px"
+            android:layout_height="0px"/>
+
         <TextView
             android:id="@+id/textView2"
             android:layout_width="0dp"
