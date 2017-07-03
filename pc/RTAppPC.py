@@ -24,18 +24,31 @@ rows = 2
 
 f, axes = plt.subplots(rows, columns, sharey=True)
 
-#plt.axis([0,40,0,40])
+plt.axis([0,1,0,1])
 plt.ion()
 plt.show()
 
+#def generate_axes(data) :
+#  return range(len(data)), data
+
 def generate_axes(data) :
-  x = range(len(data))
-  y = data
+  ds = sorted(data)
+  
+  x = range(0, int(ds[len(ds) - 1]))
+  y = []
+  
+  ds_i = 0
+  
+  for i in x :
+    y.append(0)
+    while ds[ds_i] <= i :
+      ds_i = ds_i + 1
+    y[i] = float(float(ds_i) / len(ds))
   
   return x, y
 
 def plot_data(task_id, task_data) :
-  print("Plotting data for " + str(task_id))
+  print("Plotting data for Task_" + str(task_id))
   ax = axes[task_id / columns][task_id % columns]
   
   if len(task_data) == 0 :
@@ -47,8 +60,9 @@ def plot_data(task_id, task_data) :
   #print("y:", y)
   
   #axes[task_id].axis([0,40,0,40])
-    
-  ax.clear()
+  
+  plt.axis([0,len(x),0,1])
+  #ax.clear()
   ax.plot(x, y)
   ax.set_title("Task_" + str(task_id))
   plt.draw()
@@ -78,13 +92,17 @@ def parse_message(msg) :
   
   data = []
   
-  for i in xrange(length) :
-    value = struct.unpack(">d", msg[offset:(offset + dataSize)])[0]
-    data.append(value)
-    offset = offset + dataSize
-  
-  print(data)
-  plot_data(task_id = task, task_data = data)
+  try:
+    for i in xrange(length) :
+      value = struct.unpack(">d", msg[offset:(offset + dataSize)])[0]
+      data.append(value)
+      offset = offset + dataSize
+    
+    print(data)
+    plot_data(task_id = task, task_data = data)
+  except struct.error:
+    print("struct.error, going on..." * 10000)
+    pass
   
 #------------------------------------------
 
@@ -99,7 +117,7 @@ print("DONE")
 while True:
     data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
     print("Message received, size: " + str(len(data)))
-    print("---")
-    print(data)
-    print("---")
+    #print("---")
+    #print(data)
+    #print("---")
     parse_message(data)

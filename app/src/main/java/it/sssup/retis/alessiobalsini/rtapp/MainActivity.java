@@ -155,10 +155,10 @@ public class MainActivity extends AppCompatActivity {
             GlobalTaskParameters.d = deadline;
             GlobalTaskParameters.C = computation;
 
-            task = new TimerTaskWorker("Task_" + (timers.size() - 1),
+            task = new TimerTaskWorker(timers.size() - 1,
                     first_activation_ms);
         } else {
-            task = new TimerTaskWorker("Task_" + (timers.size() - 1),
+            task = new TimerTaskWorker(timers.size() - 1,
                     first_activation_ms,
                     period,
                     deadline,

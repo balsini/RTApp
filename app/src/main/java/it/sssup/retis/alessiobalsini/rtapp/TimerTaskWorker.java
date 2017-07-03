@@ -4,6 +4,11 @@ import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.TimerTask;
 
 /**
@@ -19,6 +24,12 @@ public class TimerTaskWorker extends TimerTask {
     private double a_0; // Computation time (ms)
     private long job_id;
     private boolean global_parameters;
+    private int id;
+
+    // Response times for each job
+    private int RT_max;
+    private double RT[];
+    private int RT_c;
 
     private void busyWait(long time_ms)
     {
@@ -28,28 +39,37 @@ public class TimerTaskWorker extends TimerTask {
         while (SystemClock.currentThreadTimeMillis() - wakeup < 0) ;
     }
 
-    public TimerTaskWorker(String name,
+    private void init()
+    {
+        TAG = "Task_" + String.valueOf(id);
+        job_id = 0;
+        RT_c = 0;
+        RT_max = 125;
+        RT = new double[RT_max];
+    }
+
+    public TimerTaskWorker(int id,
                            double first_activation,
                            double period_ms,
                            double deadline_ms,
                            double computation_ms)
     {
-        TAG = name;
         global_parameters = false;
         T = period_ms;
         d = deadline_ms;
         C = computation_ms;
         a_0 = first_activation;
-        job_id = 0;
+        this.id = id;
+        init();
     }
 
-    public TimerTaskWorker(String name,
+    public TimerTaskWorker(int id,
                            double first_activation)
     {
-        TAG = name;
         global_parameters = true;
         a_0 = first_activation;
-        job_id = 0;
+        this.id = id;
+        init();
     }
 
     private void prettyStats(double a_i, double s_i, double f_i, double D_i)
@@ -114,6 +134,64 @@ public class TimerTaskWorker extends TimerTask {
         }
     }
 
+    private void send_stats()
+    {
+        try {
+            int server_port = 5505;
+            InetAddress server_addr = InetAddress.getByName("10.30.3.57");
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(bos);
+
+            int protocolVersion = 1;
+            int dataSize = 8;
+            int taskID = id;
+            int dataCount = RT_c;
+
+            ///////////////////////////
+            //    Packet format
+            //
+            //  -------------------
+            // | Protocol Version
+            //  -------------------
+            // | Task ID
+            //  -------------------
+            // | Data Size
+            //  -------------------
+            // | Length
+            //  -------------------
+            // | Data[0]
+            // | Data[1]
+            // | Data[2]
+            // | ...
+            //  -------------------
+            //
+            ///////////////////////////
+
+            dos.writeInt(protocolVersion);
+            dos.writeInt(taskID);
+            dos.writeInt(dataSize);
+            dos.writeInt(dataCount);
+
+            for (int i = 0; i < RT_max; i++) {
+                dos.writeDouble(RT[i]);
+                Log.d(TAG, "Sending: " + RT[i]);
+            }
+
+            dos.close();
+
+            DatagramSocket s = new DatagramSocket();
+            byte[] bytes = bos.toByteArray();
+            DatagramPacket p = new DatagramPacket(bytes, bytes.length, server_addr, server_port);
+            s.send(p);
+
+            Log.d(TAG, "UDP: message sent");
+
+        } catch (Exception e) {
+            Log.d(TAG, "UDP: Exception in sending: " + e.toString());
+        }
+    }
+
     @Override
     public void run()
     {
@@ -147,13 +225,20 @@ public class TimerTaskWorker extends TimerTask {
             busyWait((long)C);
         }
 
-        /*
         f_i = System.currentTimeMillis();
 
         lateness = f_i - D_i;
 
-        prettyStats(a_i, s_i, f_i, D_i);
+        if (RT_c < RT_max) {
+            RT[RT_c] = f_i - a_i;
+            RT_c++;
+        } else {
+            send_stats();
+            RT_c = 0;
+        }
 
+        prettyStats(a_i, s_i, f_i, D_i);
+/*
         if (lateness > 0) {
             Log.d(TAG, "!!! DEADLINE MISS !!!");
         } else {
