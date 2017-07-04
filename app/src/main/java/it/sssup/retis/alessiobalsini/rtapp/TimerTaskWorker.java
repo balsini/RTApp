@@ -6,6 +6,9 @@ import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -25,11 +28,18 @@ public class TimerTaskWorker extends TimerTask {
     private long job_id;
     private boolean global_parameters;
     private int id;
+    private File files_dir;
+    private FileWriter my_file;
 
     // Response times for each job
     private int RT_max;
     private double RT[];
     private int RT_c;
+
+    public enum ReportDestination {
+        DEST_FILE,
+        DEST_UDP
+    }
 
     private void busyWait(long time_ms)
     {
@@ -44,8 +54,10 @@ public class TimerTaskWorker extends TimerTask {
         TAG = "Task_" + String.valueOf(id);
         job_id = 0;
         RT_c = 0;
-        RT_max = 254;
+        //RT_max = 254;
+        RT_max = 1024;
         RT = new double[RT_max];
+        my_file = null;
     }
 
     public TimerTaskWorker(int id,
@@ -134,59 +146,105 @@ public class TimerTaskWorker extends TimerTask {
         }
     }
 
-    private void send_stats()
+    public void setFilesDir(File filesDir)
     {
+        files_dir = filesDir;
+        Log.d(TAG, "Files directory: " + files_dir.toString());
+
         try {
-            int server_port = 5505;
-            InetAddress server_addr = InetAddress.getByName("10.30.3.57");
+            File tmp_file = new File(files_dir, TAG + "_RT.txt");
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(bos);
-
-            int protocolVersion = 1;
-            int dataSize = 8;
-            int taskID = id;
-            int dataCount = RT_c;
-
-            ///////////////////////////
-            //    Packet format
-            //
-            //  -------------------
-            // | Protocol Version
-            //  -------------------
-            // | Task ID
-            //  -------------------
-            // | Data Size
-            //  -------------------
-            // | Length
-            //  -------------------
-            // | Data[0]
-            // | Data[1]
-            // | Data[2]
-            // | ...
-            //  -------------------
-            //
-            ///////////////////////////
-
-            dos.writeInt(protocolVersion);
-            dos.writeInt(taskID);
-            dos.writeInt(dataSize);
-            dos.writeInt(dataCount);
-
-            for (int i = 0; i < RT_max; i++) {
-                dos.writeDouble(RT[i]);
+            if (tmp_file.exists()) {
+                tmp_file.delete();
             }
+            tmp_file.createNewFile();
 
-            dos.close();
+            my_file = new FileWriter(tmp_file.toString(), true);
+            Log.d(TAG, "File created: " + my_file.toString());
+        } catch (IOException e) {
+            my_file = null;
+            Log.d(TAG, "File NOT created: " + e.getStackTrace().toString());
+        }
+    }
 
-            DatagramSocket s = new DatagramSocket();
-            byte[] bytes = bos.toByteArray();
-            DatagramPacket p = new DatagramPacket(bytes, bytes.length, server_addr, server_port);
-            s.send(p);
+    private void send_stats(ReportDestination dest)
+    {
+        switch (dest) {
+            case DEST_FILE:
+                try {
 
-            Log.d(TAG, "UDP: message sent");
-        } catch (Exception e) {
-            Log.d(TAG, "UDP: Exception in sending: " + e.toString());
+                    for (int i = 0; i < RT_max; i++) {
+                        my_file.write(Double.toString(RT[i]) + ",");
+                    }
+                    my_file.write("\n");
+
+                    my_file.flush();
+                    //my_file.close();
+
+                    //byte[] bytes = bos.toByteArray();
+
+                    Log.d(TAG, "File: written");
+                } catch (Exception e) {
+                    Log.d(TAG, "File: ERROR in writing: " + e.toString());
+                }
+
+                break;
+            case DEST_UDP:
+                try {
+                    int server_port = 5505;
+                    InetAddress server_addr = InetAddress.getByName("10.30.3.57");
+
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    DataOutputStream dos = new DataOutputStream(bos);
+
+                    int protocolVersion = 1;
+                    int dataSize = 8;
+                    int taskID = id;
+                    int dataCount = RT_c;
+
+                    ///////////////////////////
+                    //    Packet format
+                    //
+                    //  -------------------
+                    // | Protocol Version
+                    //  -------------------
+                    // | Task ID
+                    //  -------------------
+                    // | Data Size
+                    //  -------------------
+                    // | Length
+                    //  -------------------
+                    // | Data[0]
+                    // | Data[1]
+                    // | Data[2]
+                    // | ...
+                    //  -------------------
+                    //
+                    ///////////////////////////
+
+                    dos.writeInt(protocolVersion);
+                    dos.writeInt(taskID);
+                    dos.writeInt(dataSize);
+                    dos.writeInt(dataCount);
+
+                    for (int i = 0; i < RT_max; i++) {
+                        dos.writeDouble(RT[i]);
+                    }
+
+                    dos.close();
+
+                    DatagramSocket s = new DatagramSocket();
+                    byte[] bytes = bos.toByteArray();
+                    DatagramPacket p = new DatagramPacket(bytes, bytes.length, server_addr, server_port);
+                    s.send(p);
+
+                    Log.d(TAG, "UDP: message sent");
+                } catch (Exception e) {
+                    Log.d(TAG, "UDP: Exception in sending: " + e.toString());
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -231,7 +289,7 @@ public class TimerTaskWorker extends TimerTask {
             RT[RT_c] = f_i - a_i;
             RT_c++;
         } else {
-            send_stats();
+            send_stats(ReportDestination.DEST_FILE);
             RT_c = 0;
         }
 /*

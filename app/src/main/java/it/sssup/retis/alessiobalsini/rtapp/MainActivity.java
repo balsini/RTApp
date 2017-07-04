@@ -164,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
                     deadline,
                     computation);
         }
+        task.setFilesDir(getFilesDir());
+
         timer.scheduleAtFixedRate(task, first_activation, (long)period);
 
         showThreadsNumber();
