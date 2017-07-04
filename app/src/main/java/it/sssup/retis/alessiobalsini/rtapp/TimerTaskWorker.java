@@ -160,7 +160,7 @@ public class TimerTaskWorker extends TimerTask {
             tmp_file.createNewFile();
 
             my_file = new FileWriter(tmp_file.toString(), true);
-            Log.d(TAG, "File created: " + my_file.toString());
+            Log.d(TAG, "File created: " + tmp_file.toString());
         } catch (IOException e) {
             my_file = null;
             Log.d(TAG, "File NOT created: " + e.getStackTrace().toString());

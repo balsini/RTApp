@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
         String tasks = getIntent().getStringExtra("tasks");
         if (tasks == null)
-            tasks = "4";
+            tasks = "12";
 
         String period = getIntent().getStringExtra("period");
         if (period == null)
