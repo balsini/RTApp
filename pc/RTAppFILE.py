@@ -75,23 +75,18 @@ def getAdbFile(filename, destination) :
   s = subprocess.check_output(cmd.split())
   
 #------------------------------------------
-  
-print("Downloading files from ADB...", end="")
+
 for i in xrange(12) :
   filename = "data_" + str(i) + ".csv"
   files.append(filename)
+  print("Downloading files from ADB...", end="")
   getAdbFile("/data/user/0/it.sssup.retis.alessiobalsini.rtapp/files/Task_" + str(i) + "_RT.txt", filename)
-print("DONE")
-
-counter = 0
-for i in files :
-  print("Plotting file [" + i + "]")
-  with open(i, 'rb') as csvfile:
+  print("Done")
+  print("Plotting file [" + filename + "]")
+  with open(filename, 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in spamreader:
       data = [float(numeric_string) for numeric_string in row[0:-1]]
-      plot_data(counter, data)
-      #print(', '.join(row))
-  counter = counter + 1
-  
+      plot_data(i, data)
+
 v = input("Click enter to quit...")
