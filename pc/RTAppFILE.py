@@ -77,7 +77,7 @@ def getAdbFile(filename, destination) :
 #------------------------------------------
 
 for i in xrange(12) :
-  filename = "data_" + str(i) + ".csv"
+  filename = "/tmp/RTApp_data_" + str(i) + ".csv"
   files.append(filename)
   print("Downloading files from ADB...", end="")
   getAdbFile("/data/user/0/it.sssup.retis.alessiobalsini.rtapp/files/Task_" + str(i) + "_RT.txt", filename)
