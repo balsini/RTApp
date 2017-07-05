@@ -29,7 +29,9 @@ public class TimerTaskWorker extends TimerTask {
     private boolean global_parameters;
     private int id;
     private File files_dir;
+    private String filename;
     private FileWriter my_file;
+    public static boolean experiment_running;
 
     // Response times for each job
     private int RT_max;
@@ -58,6 +60,7 @@ public class TimerTaskWorker extends TimerTask {
         RT_max = 1024;
         RT = new double[RT_max];
         my_file = null;
+        experiment_running = false;
         updateFilesDir();
     }
 
@@ -154,6 +157,7 @@ public class TimerTaskWorker extends TimerTask {
 
         try {
             File tmp_file = new File(files_dir, TAG + "_RT.txt");
+            filename = tmp_file.toString();
 
             if (tmp_file.exists()) {
                 tmp_file.delete();
@@ -173,18 +177,13 @@ public class TimerTaskWorker extends TimerTask {
         switch (dest) {
             case DEST_FILE:
                 try {
-
-                    for (int i = 0; i < RT_max; i++) {
+                    for (int i = 0; i < RT_c; i++) {
                         my_file.write(Double.toString(RT[i]) + ",");
                     }
                     my_file.write("\n");
-
                     my_file.flush();
-                    //my_file.close();
 
-                    //byte[] bytes = bos.toByteArray();
-
-                    Log.d(TAG, "File: written");
+                    Log.d(TAG, "File written: \"" + filename + "\"");
                 } catch (Exception e) {
                     Log.d(TAG, "File: ERROR in writing: " + e.toString());
                 }
@@ -243,9 +242,9 @@ public class TimerTaskWorker extends TimerTask {
                 } catch (Exception e) {
                     Log.d(TAG, "UDP: Exception in sending: " + e.toString());
                 }
+
                 break;
-            default:
-                break;
+            default: break;
         }
     }
 
@@ -286,6 +285,19 @@ public class TimerTaskWorker extends TimerTask {
 
         lateness = f_i - D_i;
 
+        if (experiment_running) {
+            if (RT_c < RT_max) {
+                RT[RT_c] = f_i - a_i;
+                RT_c++;
+            } else {
+                Log.d(TAG, "No more space in array!");
+            }
+        } else  {
+            send_stats(ReportDestination.DEST_FILE);
+            RT_c = 0;
+        }
+
+        /*
         if (RT_c < RT_max) {
             RT[RT_c] = f_i - a_i;
             RT_c++;
@@ -293,6 +305,7 @@ public class TimerTaskWorker extends TimerTask {
             send_stats(ReportDestination.DEST_FILE);
             RT_c = 0;
         }
+        */
 /*
         prettyStats(a_i, s_i, f_i, D_i);
 
