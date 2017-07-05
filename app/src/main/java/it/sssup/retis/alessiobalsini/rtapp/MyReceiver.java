@@ -119,7 +119,7 @@ public class MyReceiver extends BroadcastReceiver {
     {
         if (timers.size() > 0) {
             timers.get(timers.size() - 1).cancel();
-            timers.get(timers.size() - 1).purge();
+            //timers.get(timers.size() - 1).purge();
             timers.remove(timers.size() - 1);
         }
     }

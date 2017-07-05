@@ -292,7 +292,7 @@ public class TimerTaskWorker extends TimerTask {
             } else {
                 Log.d(TAG, "No more space in array!");
             }
-        } else  {
+        } else if (RT_c > 0) {
             send_stats(ReportDestination.DEST_FILE);
             RT_c = 0;
         }
