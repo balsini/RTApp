@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         showThreadsNumber();
 
-        //appendDbgText(getSchedulingInfo() + "\n");
+        appendDbgText(getSchedulingInfo() + "\n");
 
         Intent intent = new Intent();
         intent.setAction("it.sssup.retis.alessiobalsini.RTAPP_INTENT");
