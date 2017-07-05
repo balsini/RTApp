@@ -69,19 +69,17 @@ Java_it_sssup_retis_alessiobalsini_rtapp_MainActivity_getSchedulingInfo(JNIEnv *
     sched_getaffinity(0, sizeof(cs), &cs);
     snice = getpriority(PRIO_PROCESS, 0);
 
-    ss << "Scheduling info: "
-       << "process (" << tid << ") "
-       << "scheduler (" << sn << ") "
-       << "priority (" << sp.sched_priority << ") "
-       << "niceness (" << snice << ") "
-       << "affinity (";
+    ss << tid << ":"
+       << " sched: " << sn
+       << " prio: " << sp.sched_priority
+       << " nice: " << snice
+       << " CPU: ";
 
     for (unsigned int i=0; i<sizeof(cs); ++i) {
         if (CPU_ISSET(i, &cs))
-            ss << " " << i << " ";
+            ss << " " << i;
     }
-
-    ss << ")";
+    ss << ".";
 
     return env->NewStringUTF(ss.str().c_str());
 }
