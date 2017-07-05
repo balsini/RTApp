@@ -58,6 +58,7 @@ public class TimerTaskWorker extends TimerTask {
         RT_max = 1024;
         RT = new double[RT_max];
         my_file = null;
+        updateFilesDir();
     }
 
     public TimerTaskWorker(int id,
@@ -146,9 +147,9 @@ public class TimerTaskWorker extends TimerTask {
         }
     }
 
-    public void setFilesDir(File filesDir)
+    public void updateFilesDir()
     {
-        files_dir = filesDir;
+        files_dir = GlobalTaskParameters.filesDir;
         Log.d(TAG, "Files directory: " + files_dir.toString());
 
         try {

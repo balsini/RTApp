@@ -1,5 +1,6 @@
 package it.sssup.retis.alessiobalsini.rtapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -10,14 +11,9 @@ import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Timer;
-
-import static java.lang.System.getProperty;
-
 public class MainActivity extends AppCompatActivity {
-    private LinkedList<Timer> timers;
+    private int desired_tasks;
+    private int current_tasks;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -84,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         String tasks = getIntent().getStringExtra("tasks");
         if (tasks == null)
-            tasks = "12";
+            tasks = Integer.toString(desired_tasks = 2);
 
         String period = getIntent().getStringExtra("period");
         if (period == null)
@@ -97,18 +93,14 @@ public class MainActivity extends AppCompatActivity {
         ((EditText) findViewById(R.id.utilizationValue)).setText(utilization);
         ((EditText) findViewById(R.id.periodValue)).setText(period);
 
-        timers = new LinkedList<Timer>();
-        timers.clear();
-
-        for (int i=0; i<Integer.parseInt(tasks); i++) {
-            increase_threads();
-        }
-
         showThreadsNumber();
 
-        appendDbgText("Desired Utilization: " + utilization + " Desired Period: " + period + "\n");
+        GlobalTaskParameters.filesDir = getFilesDir();
 
-        appendDbgText("Property debug.sys.noschedgroups: " + getProperty("debug.sys.noschedgroups") + "\n");
+        current_tasks = 0;
+
+        //appendDbgText("Desired Utilization: " + utilization + " Desired Period: " + period + "\n");
+        //appendDbgText("Property debug.sys.noschedgroups: " + getProperty("debug.sys.noschedgroups") + "\n");
     }
 
     private void appendDbgText(String txt)
@@ -126,68 +118,47 @@ public class MainActivity extends AppCompatActivity {
 
     private synchronized void showThreadsNumber()
     {
-        ((TextView) findViewById(R.id.threads_over_cores)).setText("Threads: " + timers.size()
-                + " Cores: " + Runtime.getRuntime().availableProcessors());
+        ((TextView) findViewById(R.id.desired_threads_number)).setText("#Desired: " + Integer.toString(desired_tasks));
+        ((TextView) findViewById(R.id.threads_number)).setText("#Task: " + current_tasks);
+        ((TextView) findViewById(R.id.cores_number)).setText("#Core: " + Runtime.getRuntime().availableProcessors());
     }
 
-    private synchronized void increase_threads()
+    private synchronized void go()
     {
-        TimerTaskWorker task;
-        Date first_activation;
-        Timer timer;
         double period = Double.parseDouble(((EditText) findViewById(R.id.periodValue)).getText().toString());
-        double computation = Double.parseDouble(((EditText) findViewById(R.id.utilizationValue)).getText().toString()) * period;
-        double deadline = period;
-        double phase = 2000;
-        double first_activation_ms;
-        boolean global = true;
+        double utilization = Double.parseDouble(((EditText) findViewById(R.id.utilizationValue)).getText().toString());
 
-        appendDbgText(getSchedulingInfo() + "\n");
-
-        timer = new Timer();
-        timers.add(timer);
-
-        first_activation_ms = System.currentTimeMillis() + phase;
-        first_activation = new Date((long)first_activation_ms);
-
-        if (global) {
-            GlobalTaskParameters.T = period;
-            GlobalTaskParameters.d = deadline;
-            GlobalTaskParameters.C = computation;
-
-            task = new TimerTaskWorker(timers.size() - 1,
-                    first_activation_ms);
-        } else {
-            task = new TimerTaskWorker(timers.size() - 1,
-                    first_activation_ms,
-                    period,
-                    deadline,
-                    computation);
-        }
-        task.setFilesDir(getFilesDir());
-
-        timer.scheduleAtFixedRate(task, first_activation, (long)period);
+        current_tasks = desired_tasks;
 
         showThreadsNumber();
+
+        //appendDbgText(getSchedulingInfo() + "\n");
+
+        Intent intent = new Intent();
+        intent.setAction("it.sssup.retis.alessiobalsini.RTAPP_INTENT");
+        intent.putExtra("tasks", Integer.toString(current_tasks));
+        intent.putExtra("period", Double.toString(period));
+        intent.putExtra("utilization", Double.toString(utilization));
+        sendBroadcast(intent);
     }
 
-    private synchronized void decrease_threads()
+    public void go_callback(View v)
     {
-        if (timers.size() > 0) {
-            timers.get(timers.size() - 1).cancel();
-            timers.remove(timers.size() - 1);
-        }
-        showThreadsNumber();
+        go();
     }
 
     public void increase_threads_callback(View v)
     {
-        increase_threads();
+        desired_tasks++;
+        showThreadsNumber();
     }
 
     public synchronized void decrease_threads_callback(View v)
     {
-        decrease_threads();
+        if (desired_tasks > 0) {
+            desired_tasks--;
+            showThreadsNumber();
+        }
     }
 
     /**
