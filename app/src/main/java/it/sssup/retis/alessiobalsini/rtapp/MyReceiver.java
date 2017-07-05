@@ -28,14 +28,16 @@ public class MyReceiver extends BroadcastReceiver {
         String period = intent.getStringExtra("period");
         String utilization = intent.getStringExtra("utilization");
         String tasks = intent.getStringExtra("tasks");
+        String duration = intent.getStringExtra("duration");
 
         String outputText = "RTApp Intent detected:"
                 + "\n- Tasks: " + tasks
                 + "\n- Period: " + period
-                + "\n- Utilization: " + utilization;
+                + "\n- Utilization: " + utilization
+                + "\n- Duration: " + duration;
         Toast.makeText(context, outputText, Toast.LENGTH_LONG).show();
 
-        if (period == null || tasks == null || utilization == null)
+        if (period == null || tasks == null || utilization == null || duration == null)
             return;
 
         GlobalTaskParameters.T = Double.parseDouble(period);

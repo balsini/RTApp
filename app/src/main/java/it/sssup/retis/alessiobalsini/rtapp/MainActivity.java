@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
     {
         double period = Double.parseDouble(((EditText) findViewById(R.id.periodValue)).getText().toString());
         double utilization = Double.parseDouble(((EditText) findViewById(R.id.utilizationValue)).getText().toString());
+        double duration = Double.parseDouble(((EditText) findViewById(R.id.durationValue)).getText().toString());
 
         current_tasks = desired_tasks;
 
@@ -139,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("tasks", Integer.toString(current_tasks));
         intent.putExtra("period", Double.toString(period));
         intent.putExtra("utilization", Double.toString(utilization));
+        intent.putExtra("duration", Double.toString(duration));
         sendBroadcast(intent);
     }
 
