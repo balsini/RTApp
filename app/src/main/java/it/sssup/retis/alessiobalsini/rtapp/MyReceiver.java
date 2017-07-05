@@ -68,7 +68,7 @@ public class MyReceiver extends BroadcastReceiver {
             public void run() {
                 finish_experiment();
             }
-        }, (long)(Double.parseDouble(duration) * 1000.0 + phase)); // Timer delay expressed in ms
+        }, (long)((Double.parseDouble(duration) * 1000.0) + phase)); // Timer delay expressed in ms
 
         TimerTaskWorker.experiment_running = true;
     }
