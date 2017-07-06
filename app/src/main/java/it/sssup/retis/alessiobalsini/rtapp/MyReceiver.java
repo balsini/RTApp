@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 /*
  * Use with
- * $ adb shell am broadcast -a "it.sssup.retis.alessiobalsini.RTAPP_INTENT" -e tasks 3 -e period 200 -e utilization 0.3
+ * $ adb shell am broadcast -a "it.sssup.retis.alessiobalsini.RTAPP_INTENT" -e tasks 3 -e period 200 -e utilization 0.3 -e duration 10
  */
 
 public class MyReceiver extends BroadcastReceiver {
