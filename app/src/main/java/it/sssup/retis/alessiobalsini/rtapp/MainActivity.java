@@ -5,19 +5,40 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
     private int desired_tasks;
     private int current_tasks;
+    String TAG = "MainActivity";
 
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
+    }
+
+    private void clear_experiments_dir()
+    {
+        File files_dir = getFilesDir();
+
+        Log.d(TAG, "Cleaning up files from: " + files_dir.toString());
+
+        File[] files = files_dir.listFiles();
+        Log.d(TAG, "Files in folder: "+ files.length);
+        for (int i = 0; i < files.length; i++) {
+            Log.d(TAG, "Deleting: " + files[i].getName());
+            files[i].delete();
+        }
+
+        files = files_dir.listFiles();
+        Log.d(TAG, "Files in folder: "+ files.length);
     }
 
     @Override
@@ -25,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        clear_experiments_dir();
 
         ((EditText) findViewById(R.id.utilizationValue)).addTextChangedListener(new TextWatcher()
         {
