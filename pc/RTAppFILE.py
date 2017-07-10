@@ -54,10 +54,9 @@ def plot_data(task_id, task_data) :
   if max_x < len(x) :
     max_x = len(x)
   
-  plt.axis([0,max_x,0,1])
   #ax.clear()
   ax.plot(x, y)
-  ax.set_title("Task_" + str(task_id))
+  #ax.set_title("Task_" + str(task_id))
   ax.set_xlabel("Response Time (ms)")
   ax.set_ylabel("Samples distribution")
   plt.draw()
@@ -89,13 +88,11 @@ files = []
 
 f, axes = plt.subplots(rows, columns, sharey=True)
 
-plt.title("Cumulative distribution")
-plt.axis([0,1,0,1])
+#plt.title("Cumulative distribution")
 plt.ion()
 plt.show()
 
 #####################
-
 
 count = 0
 for i in ls_results :
@@ -111,5 +108,13 @@ for i in ls_results :
       data = [float(numeric_string) for numeric_string in row[0:-1]]
       plot_data(count, data)
   count = count + 1
+
+for task_id in xrange(len(ls_results)) :
+  #print("Plotting data for Task_" + str(task_id))
+  ax = axes[task_id / columns][task_id % columns]
+  ax.set_xlim(0, max_x)
+  ax.set_ylim(0, 1)
+  ax.grid(color='0.75', linestyle='dashed', linewidth=0.5)
+
 
 v = input("Click enter to quit...")
