@@ -62,6 +62,7 @@ public class TimerTaskWorker extends TimerTask {
         my_file = null;
         experiment_running = false;
         updateFilesDir();
+        //Log.d(TAG, goFIFO());
     }
 
     public TimerTaskWorker(int id,
@@ -331,5 +332,6 @@ public class TimerTaskWorker extends TimerTask {
         */
     }
 
+    private native String goFIFO();
     private native String getSchedulingInfo();
 }

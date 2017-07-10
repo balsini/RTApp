@@ -19,7 +19,7 @@ import java.util.TimerTask;
 public class MyReceiver extends BroadcastReceiver {
     private static LinkedList<Timer> timers = null;
     private static Timer experiment_expired_timer = null;
-    private final static double phase = 2000;
+    private final static double phase = 10000;
     private final static String TAG = "MyReceiver";
 
     @Override
