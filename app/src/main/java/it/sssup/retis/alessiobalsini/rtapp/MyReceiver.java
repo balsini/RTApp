@@ -18,6 +18,7 @@ import java.util.TimerTask;
 
 public class MyReceiver extends BroadcastReceiver {
     private static LinkedList<Timer> timers = null;
+    private static LinkedList<TimerTaskWorker> tasks = null;
     private static Timer experiment_expired_timer = null;
     private final static double phase = 10000;
     private final static String TAG = "MyReceiver";
@@ -28,6 +29,10 @@ public class MyReceiver extends BroadcastReceiver {
         if (timers == null) {
             timers = new LinkedList<Timer>();
             timers.clear();
+        }
+        if (tasks == null) {
+            tasks = new LinkedList<TimerTaskWorker>();
+            tasks.clear();
         }
 
         String period = intent.getStringExtra("period");
@@ -112,6 +117,7 @@ public class MyReceiver extends BroadcastReceiver {
                     computation);
         }
 
+        tasks.add(task);
         timer.scheduleAtFixedRate(task, first_activation, (long)period);
     }
 
@@ -119,8 +125,12 @@ public class MyReceiver extends BroadcastReceiver {
     {
         if (timers.size() > 0) {
             timers.get(timers.size() - 1).cancel();
-            //timers.get(timers.size() - 1).purge();
+            timers.get(timers.size() - 1).purge();
             timers.remove(timers.size() - 1);
+        }
+        if (tasks.size() > 0) {
+            tasks.get(tasks.size() - 1).send_stats(ReportDestination.DEST_FILE);
+            tasks.remove(tasks.size() - 1);
         }
     }
 }

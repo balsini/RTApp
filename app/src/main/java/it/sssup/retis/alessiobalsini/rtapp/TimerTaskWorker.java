@@ -38,11 +38,6 @@ public class TimerTaskWorker extends TimerTask {
     private double RT[];
     private int RT_c;
 
-    public enum ReportDestination {
-        DEST_FILE,
-        DEST_UDP
-    }
-
     private void busyWait(long time_ms)
     {
         long wakeup;
@@ -173,7 +168,7 @@ public class TimerTaskWorker extends TimerTask {
         }
     }
 
-    private void send_stats(ReportDestination dest)
+    public void send_stats(ReportDestination dest)
     {
         switch (dest) {
             case DEST_FILE:
@@ -293,10 +288,10 @@ public class TimerTaskWorker extends TimerTask {
             } else {
                 Log.d(TAG, "No more space in array!");
             }
-        } else if (RT_c > 0) {
-            send_stats(ReportDestination.DEST_FILE);
-            RT_c = 0;
-        }
+        }// else if (RT_c > 0) {
+        //    send_stats(ReportDestination.DEST_FILE);
+        //    RT_c = 0;
+        //}
 
         /*
         if (RT_c < RT_max) {
