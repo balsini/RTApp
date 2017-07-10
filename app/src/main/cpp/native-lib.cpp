@@ -84,6 +84,32 @@ Java_it_sssup_retis_alessiobalsini_rtapp_MainActivity_getSchedulingInfo(JNIEnv *
     return env->NewStringUTF(ss.str().c_str());
 }
 
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_it_sssup_retis_alessiobalsini_rtapp_TimerTaskWorker_goFIFO(JNIEnv *env, jobject)
+{
+    int tid;
+    int res;
+    sched_param param;
+    std::stringstream ss;
+
+    param.sched_priority = sched_get_priority_min(SCHED_FIFO);
+
+    tid = syscall(SYS_gettid);
+
+    ss << "Moving " << tid << "to FIFO";
+
+    res = sched_setscheduler(0, SCHED_FIFO, &param);
+
+    if (res == 0) {
+        ss << " - SUCCESS :)";
+    } else {
+        ss << " - FAILURE :( - " << strerror(errno);
+    }
+
+    return env->NewStringUTF(ss.str().c_str());
+}
+
 #if 0
 extern "C"
 JNIEXPORT jstring JNICALL
