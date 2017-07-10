@@ -4,7 +4,9 @@ from __future__ import print_function
 
 import subprocess
 import csv
+import os
 import random
+import math
 import matplotlib.pyplot as plt
 
 VERSION = "0.1"
@@ -15,18 +17,10 @@ print("RTAppPC v" + VERSION)
 
 #------------------------------------------
 
-columns = 4
-rows = 3
+columns = 0 # to be initialized
+rows = 0    # to be initialized
+
 max_x = 0
-
-files = []
-
-f, axes = plt.subplots(rows, columns, sharey=True)
-
-plt.title("Cumulative distribution")
-plt.axis([0,1,0,1])
-plt.ion()
-plt.show()
 
 #def generate_axes(data) :
 #  return range(len(data)), data
@@ -76,17 +70,44 @@ def getAdbFile(filename, destination) :
   
 #------------------------------------------
 
-for i in xrange(12) :
-  filename = "/tmp/RTApp_data_" + str(i) + ".csv"
+app_folder = "/data/user/0/it.sssup.retis.alessiobalsini.rtapp/files"
+cmd = "adb shell ls " + app_folder
+ls_results = subprocess.check_output(cmd.split()).splitlines()
+
+print("Number of plots: {}".format(len(ls_results)))
+
+columns = int(math.ceil(math.sqrt(len(ls_results)))) # to be initialized
+rows = int(math.ceil(float(len(ls_results)) / columns))    # to be initialized
+
+print("Columns and rows: {} {}".format(columns, rows))
+
+#####################
+
+files = []
+
+f, axes = plt.subplots(rows, columns, sharey=True)
+
+plt.title("Cumulative distribution")
+plt.axis([0,1,0,1])
+plt.ion()
+plt.show()
+
+#####################
+
+
+count = 0
+for i in ls_results :
+  filename = "/tmp/" + i + ".csv"
   files.append(filename)
   print("Downloading files from ADB...", end="")
-  getAdbFile("/data/user/0/it.sssup.retis.alessiobalsini.rtapp/files/Task_" + str(i) + "_RT.txt", filename)
+  getAdbFile(os.path.join(app_folder, i), filename)
   print("Done")
   print("Plotting file [" + filename + "]")
   with open(filename, 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in spamreader:
       data = [float(numeric_string) for numeric_string in row[0:-1]]
-      plot_data(i, data)
+      plot_data(count, data)
+  count = count + 1
 
 v = input("Click enter to quit...")
