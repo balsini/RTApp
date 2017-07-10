@@ -70,6 +70,8 @@ def getAdbFile(filename, destination) :
   
 #------------------------------------------
 
+go_root = subprocess.check_output("adb root".split())
+
 app_folder = "/data/user/0/it.sssup.retis.alessiobalsini.rtapp/files"
 cmd = "adb shell ls " + app_folder
 ls_results = subprocess.check_output(cmd.split()).splitlines()
